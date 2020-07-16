@@ -3,59 +3,28 @@ const knex = require('../config/knex').knex;
 const helper = require('../lib/helper');
 const {validate, checkHeader} = require('../middleware/valid'); 
 const bcrypt = require("bcryptjs");
-const jwt = require('jsonwebtoken');
-const util = require('../config/util').get(process.env.NODE_ENV);
 // const mailer = require("../plugins/mailer");
 // const router = require('express').Router;
 
 const router = express.Router();
 
-//check if 
-router.get("/:email/exist", (req, res) => { 
-   try {
-     const email = req.params.email;  
-     knex('staffs').where({email}).select('email').then( ( data ) => {  
-     if(data.length > 0) {
-      res.send({exist: true});
-    } else {
-       res.send({exist: false});
-     } 
-    
-    }); 
-  } catch (err) {
-    console.log(err);
-  }
-
-});
 
  
-
-router.get("/:user/exist", (req, res) => { 
-  const name = req.params.username;
-    knex('staffs').where('email', name).select().then( ( data ) => { 
-    // console.log(data, data.length); 
-     if(data.length > 0) res.send({exist: true}); 
-       res.send({exist: false});
-    });  
- 
-
-});
-
-//get all staff
+//get all product
 router.get("/", (req, res) => {  
-     knex('staffs').join('roles', 'staffs.role', '=', 'roles.id')
-     .select('staffs.id', 'staffs.role', 'staffs.fullname', 'staffs.email', 
-      'staffs.phone', 'staffs.username', 'staffs.image', 'staffs.status',  'staffs.created_at',  'staffs.updated_at', 
-      'roles.name as roleName').then( ( data ) => {  
+     knex('products')
+      .join('sellers as s', 'products.shop_id', '=', 's.id')
+      .join('categories as c', 'products.cat_id', '=', 'c.id')
+   .select('products.*', 'c.name as catName',
+       's.shop_name as shopName').then( ( data ) => {    
              res.send( data ).status(200); 
              });
 });
-
-
+ 
 //get staff details by id
 router.get("/:id", checkHeader, (req, res) => {  
     const id = req.params.id ; 
-        const result = knex('staffs').where({id}).select().then( ( data ) => {              
+        const result = knex('products').where({id}).select().then( ( data ) => {              
             if(data) {
                 res.send({
                     status: 200,
@@ -66,28 +35,33 @@ router.get("/:id", checkHeader, (req, res) => {
                  status: 400
               });
             
-            
              });
 }); 
 
 //get profile
-router.get("/get/profile", (req, res) => {   
+router.get("/get/profile", (req, res) => {  
+       // var reply = helper.getProfile(req, 'products', 'admin_id');
+       // console.log('reply', reply);
   try {    
     const verify = helper.isThereToken(req);
     if(verify && verify.exist === true) {
       const token = verify.token; 
       knex('signatures').where({token}).select('admin_id').then((data) => { 
         if (data.length > 0) {
-          knex('staffs').where('id', data[0].admin_id).then((payload) => {
+          knex('products').where('id', data[0].admin_id).then((payload) => {
             const role = payload[0].role;
-            const result = knex('roles').where('id', role).select('name').then( ( roleData ) => {
+            const result = knex('shops').where('id', role).select('name').then( ( roleData ) => {
               payload[0].roleName = roleData[0].name;
-              // console.log(payload[0]);
+              console.log(payload[0]);
             res.send({
                         status: 200,
                         data: payload[0]
-                      }) 
-            }); 
+                      })
+
+            });
+     
+
+          
            
           }) 
         
@@ -111,13 +85,12 @@ router.get("/get/profile", (req, res) => {
 }
   }); 
 //create staff account
-router.post("/", validate('staffs'),  (req, res) => {   
+router.post("/", validate('products'),  (req, res) => {   
     const {fullname,  role, username, email} = req.body; 
     const password = helper.hash(req.body.password);
     const created_at = new Date().toLocaleString();
-    let response = null;
-    // knex('staffs').returning('id')
-    knex('staffs')
+    let response = null; 
+    knex('products')
     .insert({ fullname, email, username, password, role, created_at }).then( ( result ) => { 
     if(result) { 
     knex('signatures').insert({admin_id: result}).then( reply => {
@@ -147,7 +120,7 @@ router.post("/update", (req, res) => {
     const {fullname,  role, username, id} = req.body;   
     const updated_at = new Date().toLocaleString();  
     let response = null; 
-    knex('staffs').where('id', id).update({ fullname, username, role, updated_at }).then( ( result ) => { 
+    knex('products').where('id', id).update({ fullname, username, role, updated_at }).then( ( result ) => { 
    if(result) { 
             res.send( {
                 status: 200,
@@ -162,61 +135,42 @@ router.post("/update", (req, res) => {
     }); 
 });
 
-router.post("/toggle", (req, res) => {   
-    const {status, id} = req.body;   
-    const updated_at = new Date().toLocaleString();  
-    let response = null; 
-    knex('staffs').where('id', id).update({ status, updated_at }).then( ( result ) => { 
-   if(result) { 
-            res.send( {
-                status: 200,
-                message: 'Account updated successfully'
-                } );
-        } else {
-            res.send({
-                status: 204,
-                message: 'Account was not updated'
-            })
-        }
-    }); 
-});
+router.post("/auth",  (req, res) => { 
 
-router.post("/auth", (req, res) => {
-   const username = req.body.user;
-    const password = helper.hash(req.body.password); 
-    knex('staffs').where({username}).select().then( (user ) => {
-        if(user.length > 0) {
+ // console.log( helper.hash('testing'));
+     const username = req.body.user;
+    const password = helper.hash(req.body.password);  
+      knex('products').where('username', username).select()
+     .then((user) => {  
+      if(user.length < 1) {
+        res.send({
+          status: 400,
+          msg: "wrong username or password"
+        });
+      } else { 
         const data = user[0];
-        if (bcrypt.compareSync(req.body.password, data.password)) {
-             const token = helper.generateToken(data);  
-              knex('signatures').where('admin_id', data.id).update( 'token', token).then( sign => {
+        if( bcrypt.compareSync(req.body.password, data.password)) {  
+          const token = helper.generateToken(data); 
+        // console.log(token);
+         knex('signatures').where('admin_id', data.id).update( 'token', token).then( sign => {
          if(sign) {
           res.send({
             status: 200,
-             msg: "Login successful", 
             user: data,
             token
            });
           }
       });
-           
-        } else {
-            res.send({
-          status: 400,
-          msg: "wrong username or password"
-        });
-        }
-           
-        } else {
-             res.send({
-          status: 400,
-          msg: "wrong username or password"
-        });
-        }
-        
-    })
+
+          } else {
+              res.send({
+              status: 400,
+              msg: "wrong username or password"
+            });
+          }
+        }//user found
+       });
    
 });
-
 
 module.exports = router;

@@ -17,7 +17,7 @@ const knex = require('../config/knex').knex;
 
  function checkHeader(req, res, next) {
   try {
-    if(req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
+    if(req.headers.authorization && (req.headers.authorization.split(' ')[0] === 'bearer' || req.headers.authorization.split(' ')[0] === 'Bearer')) {
       const token = req.headers.authorization.split(' ')[1];
       console.log('token', token);
       knex('signatures').where({token}).select().then((data) => {

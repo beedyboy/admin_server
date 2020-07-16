@@ -1,8 +1,7 @@
 const express = require('express');
 const knex = require('../config/knex').knex; 
 const helper = require('../lib/helper');
-const {valid, verify} = require('../middleware/valid');
-const bcrypt = require('bcryptjs');
+const { generateSlug } = require('../lib/function');
 const mailer = require("../plugins/mailer"); 
 const sms  = require('../plugins/sms');
 // const router = require('express').Router;
@@ -11,24 +10,10 @@ const router = express.Router();
 
 // const router = Router();
 
-router.get("/:email", (req, res) => { 
-    const name = req.params.email;
-        const result = knex('companies').where('email', name).select().then( ( data ) => { 
-           if(data) {
-               res.send({
-                   exist: true
-               })
-           }
-             res.send({
-                 exist: false
-             });
-            
-            
-             });
-});
+ 
 
 router.get("/", (req, res) => {  
-        const result = knex('companies').select().then( ( data ) => {  
+        const result = knex('company').select().then( ( data ) => {  
              res.send( data ).status(200);
             
             
@@ -42,12 +27,76 @@ router.post("/mail", (req, res) => {
     res.send("sent");
 });
 
-router.post("/", valid,  (req, res) => {
+router.get("/getProfile", (req, res) => {  
+    const id = 1 ; 
+        const result = knex('company').where({id}).select().then( ( data ) => {              
+            if(data) {
+                res.send({
+                    status: 200,
+                    data
+                })
+            }
+                          
+             });
+});
+
+router.get("/pages", (req, res) => {   
+        const result = knex('pages').select().then( ( data ) => {              
+            if(data) {
+                res.send({
+                    status: 200,
+                    data
+                })
+            }
+              
+             });
+}); 
+
+
+router.post("/",  (req, res) => { 
+    const { name: companyname, address, email,  phone} = req.body;   
+    knex('company').where('id', 1).update({  companyname, address, email, phone }).then( ( result ) => { 
+        
+        if(result) { 
+            res.send( {
+                status: 200,
+                message: 'Profile updated successfully'
+                } );
+        } else {
+            res.send({
+                status: 204,
+                message: 'Account not updated'
+            })
+        }
+    }); 
+});
+
+
+router.post("/pages",  (req, res) => { 
+    const { description, title} = req.body; 
+    const slug =   generateSlug(title);
+    const created_at = new Date().toLocaleString();
+    knex('pages').insert({  description, title, slug, created_at }).then( ( result ) => { 
+        
+        if(result) { 
+            res.send( {
+                status: 200,
+                message: 'New page created successfully'
+                } );
+        } else {
+            res.send({
+                status: 204,
+                message: 'Page not created'
+            })
+        }
+    }); 
+});
+
+router.post("/pd",  (req, res) => {
 //    console.log("REQUEST", req.body);
-    const {sid, companyname, address, email,  phone} = req.body; 
-    const password = helper.hash(req.body.password);
+    const { name: companyname, address, email,  phone} = req.body;  
     const created_at = new Date().toLocaleString(); 
-    knex('companies').insert({  sid, companyname, address, email, password, phone, created_at }).then( ( result ) => { 
+    knex('company').insert({  companyname, address, email, phone, created_at }).then( ( result ) => { 
         
         if(result) {
             const code = helper.generateToken();
@@ -76,50 +125,4 @@ router.post("/", valid,  (req, res) => {
 });
 
 
-router.post("/verify", verify, (req, res) => { 
-    const {email} = req.body; 
-    knex('companies').where('email', email).update( 'status', 'Active').then( user => {
-        if (!user) {
-            res.json({
-               status: 204, 
-               msg: "Error activating account"
-            });
-           }  
-           res.json({
-               status: 200, 
-               msg: "Account activated successfully"
-            });
-    })
-  
-   
-});
-router.post("/auth", (req, res) => {
-    // const {email, password} = req.body;
-    // password = helper.hash(password);  
-    // let user =  knex('companies').where({email }).select();
-    // if (!user) {
-    //      res.json({
-    //         status: 204,
-    //         isAuth: false,
-    //         msg: "Wrong email or password",
-    //         user
-    //      });
-    //     } else {
-    //         if (bcrypt.compareSync(password, user.password)) {
-    //             res.json({
-    //                 status: 200, 
-    //                 user
-    //             });
-    //         } else {
-    //             res.json({
-    //                 status: 204,
-    //                 isAuth: false,
-    //                 msg: "Wrong email or password",
-    //                 user
-    //              });
-    //         }
-               
-    //     }
-   
-});
 module.exports = router;

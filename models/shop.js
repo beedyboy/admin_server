@@ -36,7 +36,8 @@ router.get("/:name/exist", (req, res) => {
 
 //get all modules
 router.get("/", (req, res) => {  
-const result = knex('shops').select().then( ( data ) => {   
+ knex('shops').join('members', 'shops.mid', '=', 'members.id')
+ .select('*', 'members.firstname as fn').then( ( data ) => {   
 
      res.send( data ).status(200); 
      });

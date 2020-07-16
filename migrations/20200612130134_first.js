@@ -68,28 +68,7 @@ exports.up = function(knex) {
     .onDelete('CASCADE') .onUpdate('CASCADE');
 }) 
 
-
-  .createTable( 'members', function( membersTable ) { 
-    membersTable.engine('InnoDB'); 
-    membersTable.increments();
-    membersTable.string( 'firstname', 30 ).nullable();
-    membersTable.string( 'lastname', 30 ).nullable();
-    membersTable.string( 'email', 30 ).notNullable(); 
-    membersTable.string( 'password', 250 ).notNullable();    
-    membersTable.string( 'phone', 30 ).nullable();   
-    membersTable.string( 'nickname', 30 ).nullable(); 
-    membersTable.enu('gender', ['Male', 'Female', 'Others']).defaultTo('Others');   
-    membersTable.integer( 'location' ).unsigned().nullable(); 
-    membersTable.string( 'image', 100 ).nullable();    
-    membersTable.integer( 'attempt').nullable();   
-    membersTable.string( 'last_login', 30 ).nullable();   
-	membersTable.string('created_at',  50).nullable();
-	membersTable.string('updated_at',  50).nullable();
-    membersTable.enu('status', ['Active', 'Pending', 'Deleted', 'Banned']).defaultTo('Pending');
-    membersTable.foreign('location').references('id').inTable('cities')
-    .onDelete('CASCADE') .onUpdate('CASCADE');
-})
-
+ 
  
 .createTable( 'signatures', function( signatureTable ) { 
     signatureTable.engine('InnoDB');
@@ -104,19 +83,6 @@ exports.up = function(knex) {
     .onDelete('CASCADE') .onUpdate('CASCADE');
 })
 
-.createTable( 'shops', function( shopTable ) { 
-    shopTable.engine('InnoDB');
-    shopTable.increments();  
-    shopTable.integer('mid').unsigned().nullable(); 
-    shopTable.string( 'name', 30 ).nullable();      
-    shopTable.text( 'description' ).nullable();         
-    shopTable.integer( 'location' ).unsigned().nullable(); 
-    shopTable.enu('status', ['Active', 'Inactive', 'Deleted']).defaultTo('Active');
-    shopTable.foreign('mid').references('id').inTable('members')
-    .onDelete('CASCADE') .onUpdate('CASCADE');
-    shopTable.foreign('location').references('id').inTable('cities')
-    .onDelete('CASCADE') .onUpdate('CASCADE');
-})
 
 
 
@@ -134,6 +100,7 @@ exports.up = function(knex) {
 .createTable( 'tokens', function( tokenTable ) { 
     tokenTable.engine('InnoDB');
     tokenTable.increments();  
+    tokenTable.string( 'referrer', 20 ).notNullable();  
     tokenTable.string( 'token', 250 ).nullable();  
     tokenTable.string( 'email', 50 ).nullable();  
     tokenTable.enu('used', ['No', 'Yes', 'Expired']).defaultTo('No');

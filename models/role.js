@@ -52,7 +52,7 @@ router.get("/:name/exist", (req, res) => {
 
 //get all roles
 router.get("/", (req, res) => {  
-        const result = knex('roles').select().then( ( data ) => {  
+   knex('roles').select().then( ( data ) => {  
              res.send( data ).status(200); 
              });
 });

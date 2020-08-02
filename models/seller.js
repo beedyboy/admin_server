@@ -41,7 +41,38 @@ const result = knex('sellers').select().then( ( data ) => {
           })
 }); 
 
- 
+  
+router.post("/toggle", (req, res) => {   
+      const {status, id} = req.body;  
+      const updated_at = new Date().toLocaleString(); 
+     knex('sellers').where('id', id).update('status', status)
+     .update('updated_at', updated_at)
+    .then( ( data ) => {  
+      if(data > 0) {
+          helper.actDCTLogin('shop_id', id, status)
+        res.send({
+        status: 200, 
+        message: "Seller account updated" 
+       });
+      }
+        else {
+          res.send({
+          status: 400,
+          message: "Error updating status" 
+        });
+        }
+      
+      
+       }).catch(error =>  {
+        console.log('error', error);
+        res.send({
+          status: 400,
+          message: error
+        })
+      });
+               
+    });
+  
 router.delete("/:id", (req, res) => { 
    try {
     knex('sellers').where('id', req.params.id).del().then( (result) => {

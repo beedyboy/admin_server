@@ -20,6 +20,31 @@ router.get("/", (req, res) => {
              });
 });
 
+//orders
+// users
+// transactions
+// bids
+router.get("/dashboard", (req, res) => {  
+    let buyers = 0;
+    let sellers = 0;
+    knex('buyers').count('id as b').then( (buyer) => {
+        buyers = buyer[0].b; 
+    knex('sellers').count('id as s').then( (seller) => {
+            sellers = seller[0].s
+    knex('products').count('id as p').then( (product) => {
+        res.send({
+        buyers,
+        sellers,
+        products: product[0].p
+
+        });
+    });
+        
+    });
+    });
+       
+});
+
 router.post("/mail", (req, res) => {
     const subject = "Testing email server";
     const body = "This is to say, mailer is working";

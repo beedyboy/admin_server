@@ -114,8 +114,7 @@ router.get("/get/profile", (req, res) => {
 router.post("/", validate('staffs'),  (req, res) => {   
     const {fullname,  role, username, email} = req.body; 
     const password = helper.hash(req.body.password);
-    const created_at = new Date().toLocaleString();
-    let response = null;
+    const created_at = new Date().toLocaleString(); 
     // knex('staffs').returning('id')
     knex('staffs')
     .insert({ fullname, email, username, password, role, created_at }).then( ( result ) => { 
@@ -146,7 +145,6 @@ router.post("/", validate('staffs'),  (req, res) => {
 router.post("/update", (req, res) => {   
     const {fullname,  role, username, id} = req.body;   
     const updated_at = new Date().toLocaleString();  
-    let response = null; 
     knex('staffs').where('id', id).update({ fullname, username, role, updated_at }).then( ( result ) => { 
    if(result) { 
             res.send( {
@@ -165,7 +163,6 @@ router.post("/update", (req, res) => {
 router.post("/toggle", (req, res) => {   
     const {status, id} = req.body;   
     const updated_at = new Date().toLocaleString();  
-    let response = null; 
     knex('staffs').where('id', id).update({ status, updated_at }).then( ( result ) => { 
    if(result) { 
             res.send( {

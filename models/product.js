@@ -1,5 +1,5 @@
 const express = require('express');
-const knex = require('../config/knex').knex; 
+const db = require('../config/knex'); 
 const helper = require('../lib/helper');
 const {validate, checkHeader} = require('../middleware/valid'); 
 const bcrypt = require("bcryptjs");
@@ -11,12 +11,13 @@ const router = express.Router();
 
  
 //get all product 
+   // .join('sellers as s', 'products.shop_id', '=', 's.id')
 router.get("/", (req, res) => {  
-  knex('products') 
-   .join('sellers as s', 'products.shop_id', '=', 's.id')
+  db('products') 
+   .join('shops as shop', 'products.shop_id', '=', 'shop.id')
    .join('categories as c', 'products.cat_id', '=', 'c.id')
 .select('products.*', 'c.name as catName',
-    's.shop_name as shopName').then( ( data ) => {  
+    'shop.shop_name as shopName').then( ( data ) => {  
           res.send( data ).status(200); 
           }).catch(err => {
             console.log('all ', err);
@@ -26,7 +27,7 @@ router.get("/", (req, res) => {
 //get product details by id
 router.get("/:id", checkHeader, (req, res) => {  
     const id = req.params.id ; 
-        const result = knex('products').where({id}).select().then( ( data ) => {              
+        const result = db('products').where({id}).select().then( ( data ) => {              
             if(data) {
                 res.send({
                     status: 200,
@@ -44,7 +45,7 @@ router.get("/:id", checkHeader, (req, res) => {
 router.post("/toggle", (req, res) => {   
   const {status, id} = req.body;   
   const updated_at = new Date().toLocaleString();  
-  knex('products').where('id', id).update({ status, updated_at }).then( ( result ) => { 
+  db('products').where('id', id).update({ status, updated_at }).then( ( result ) => { 
  if(result) { 
           res.send( {
               status: 200,

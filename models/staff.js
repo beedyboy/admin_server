@@ -1,5 +1,5 @@
 const express = require('express');
-const knex = require('../config/knex').knex; 
+const db = require('../config/knex'); 
 const helper = require('../lib/helper');
 const {validate, checkHeader} = require('../middleware/valid'); 
 const bcrypt = require("bcryptjs");
@@ -14,7 +14,7 @@ const router = express.Router();
 router.get("/:email/exist", (req, res) => { 
    try {
      const email = req.params.email;  
-     knex('staffs').where({email}).select('email').then( ( data ) => {  
+     db('staffs').where({email}).select('email').then( ( data ) => {  
      if(data.length > 0) {
       res.send({exist: true});
     } else {
@@ -32,7 +32,7 @@ router.get("/:email/exist", (req, res) => {
 
 router.get("/:user/exist", (req, res) => { 
   const name = req.params.username;
-    knex('staffs').where('email', name).select().then( ( data ) => { 
+    db('staffs').where('email', name).select().then( ( data ) => { 
     // console.log(data, data.length); 
      if(data.length > 0) res.send({exist: true}); 
        res.send({exist: false});
@@ -43,7 +43,7 @@ router.get("/:user/exist", (req, res) => {
 
 //get all staff
 router.get("/", (req, res) => {  
-     knex('staffs').join('roles', 'staffs.role', '=', 'roles.id')
+     db('staffs').join('roles', 'staffs.role', '=', 'roles.id')
      .select('staffs.id', 'staffs.role', 'staffs.fullname', 'staffs.email', 
       'staffs.phone', 'staffs.username', 'staffs.image', 'staffs.status',  'staffs.created_at',  'staffs.updated_at', 
       'roles.name as roleName').then( ( data ) => {  
@@ -55,7 +55,7 @@ router.get("/", (req, res) => {
 //get staff details by id
 router.get("/:id", checkHeader, (req, res) => {  
     const id = req.params.id ; 
-        const result = knex('staffs').where({id}).select().then( ( data ) => {              
+        const result = db('staffs').where({id}).select().then( ( data ) => {              
             if(data) {
                 res.send({
                     status: 200,
@@ -76,11 +76,11 @@ router.get("/get/profile", (req, res) => {
     const verify = helper.isThereToken(req);
     if(verify && verify.exist === true) {
       const token = verify.token; 
-      knex('signatures').where({token}).select('admin_id').then((data) => { 
+      db('signatures').where({token}).select('admin_id').then((data) => { 
         if (data.length > 0) {
-          knex('staffs').where('id', data[0].admin_id).then((payload) => {
+          db('staffs').where('id', data[0].admin_id).then((payload) => {
             const role = payload[0].role;
-            const result = knex('roles').where('id', role).select('name').then( ( roleData ) => {
+            const result = db('roles').where('id', role).select('name').then( ( roleData ) => {
               payload[0].roleName = roleData[0].name;
               // console.log(payload[0]);
             res.send({
@@ -114,12 +114,12 @@ router.get("/get/profile", (req, res) => {
 router.post("/", validate('staffs'),  (req, res) => {   
     const {fullname,  role, username, email} = req.body; 
     const password = helper.hash(req.body.password);
-    const created_at = new Date().toLocaleString(); 
-    // knex('staffs').returning('id')
-    knex('staffs')
+    const created_at = new Date().toLocaleString();  
+    db('staffs')
+    .returning('id')
     .insert({ fullname, email, username, password, role, created_at }).then( ( result ) => { 
-    if(result) { 
-    knex('signatures').insert({admin_id: result}).then( reply => {
+    if(result.length > 0) {  
+    db('signatures').insert({admin_id: result[0]}).then( reply => {
         if(reply)  {
           res.send({
                         status: 200,
@@ -145,7 +145,7 @@ router.post("/", validate('staffs'),  (req, res) => {
 router.post("/update", (req, res) => {   
     const {fullname,  role, username, id} = req.body;   
     const updated_at = new Date().toLocaleString();  
-    knex('staffs').where('id', id).update({ fullname, username, role, updated_at }).then( ( result ) => { 
+    db('staffs').where('id', id).update({ fullname, username, role, updated_at }).then( ( result ) => { 
    if(result) { 
             res.send( {
                 status: 200,
@@ -163,7 +163,7 @@ router.post("/update", (req, res) => {
 router.post("/toggle", (req, res) => {   
     const {status, id} = req.body;   
     const updated_at = new Date().toLocaleString();  
-    knex('staffs').where('id', id).update({ status, updated_at }).then( ( result ) => { 
+    db('staffs').where('id', id).update({ status, updated_at }).then( ( result ) => { 
    if(result) { 
             res.send( {
                 status: 200,
@@ -181,12 +181,12 @@ router.post("/toggle", (req, res) => {
 router.post("/auth", (req, res) => {
    const username = req.body.user;
     const password = helper.hash(req.body.password); 
-    knex('staffs').where({username}).select().then( (user ) => {
+    db('staffs').where({username}).select().then( (user ) => {
         if(user.length > 0) {
         const data = user[0];
         if (bcrypt.compareSync(req.body.password, data.password)) {
              const token = helper.generateToken(data);  
-              knex('signatures').where('admin_id', data.id).update( 'token', token).then( sign => {
+              db('signatures').where('admin_id', data.id).update( 'token', token).then( sign => {
          if(sign) {
           res.send({
             status: 200,

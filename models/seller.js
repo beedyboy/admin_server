@@ -1,5 +1,5 @@
 const express = require('express');
-const knex = require('../config/knex').knex; 
+const db = require('../config/knex'); 
 const helper = require('../lib/helper');  
 const router = express.Router(); 
 const {validate, checkHeader} = require('../middleware/valid'); 
@@ -7,7 +7,7 @@ const {validate, checkHeader} = require('../middleware/valid');
 //get sellers details by id
 router.get("/:id", (req, res) => {
     const id = req.params.id;
-    const result = knex('sellers').where({id}).select().then( ( data ) => { 
+    const result = db('sellers').where({id}).select().then( ( data ) => { 
      if(data) {
          res.send({
              status: 200,
@@ -28,7 +28,7 @@ router.get("/:id", (req, res) => {
 
 //get all sellers
 router.get("/", (req, res) => {  
-const result = knex('sellers').select().then( ( data ) => {   
+const result = db('sellers').select().then( ( data ) => {   
  if(data) {
               res.send({
                   status: 200,
@@ -45,7 +45,7 @@ const result = knex('sellers').select().then( ( data ) => {
 router.post("/toggle", (req, res) => {   
       const {status, id} = req.body;  
       const updated_at = new Date().toLocaleString(); 
-     knex('sellers').where('id', id).update('status', status)
+     db('sellers').where('id', id).update('status', status)
      .update('updated_at', updated_at)
     .then( ( data ) => {  
       if(data > 0) {
@@ -75,7 +75,7 @@ router.post("/toggle", (req, res) => {
   
 router.delete("/:id", (req, res) => { 
    try {
-    knex('sellers').where('id', req.params.id).del().then( (result) => {
+    db('sellers').where('id', req.params.id).del().then( (result) => {
         res.send({
             status: 200,
             message: 'Buyer deleted successgully'

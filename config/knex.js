@@ -1,26 +1,16 @@
 
- 
+ const knex = require('knex');
+ const env = process.env.DB_ENV || 'development'
+ const config = require('../knexfile.js');
+ const db = knex(config[env]);
 
-exports.knex = require( 'knex' )( {
+ module.exports = db;
 
-  client: 'mysql',
-  connection: { 
-    host: '209.205.209.130',
-    user: 'devprima_noroot',
-    password: '&CI@bQ^d0hTm',
-    database: 'devprima_bcommerce',
-    charset: 'utf8',
-
-  }
-
-} );
-
-  
 // exports.knex = require( 'knex' )( {
 
 //   client: 'mysql',
 //   connection: { 
-//     host: '127.0.0.1',
+//     host: '209.205.209.130',
 //     user: 'devprima_noroot',
 //     password: '&CI@bQ^d0hTm',
 //     database: 'devprima_bcommerce',
@@ -29,5 +19,4 @@ exports.knex = require( 'knex' )( {
 //   }
 
 // } );
-
- // mysql://b630dcb44f737e:76bc6049@us-cdbr-east-05.cleardb.net/heroku_0af4a054f44f63f?reconnect=true
+ 

@@ -1,11 +1,11 @@
 
-const knex = require('../config/knex').knex; 
+const db = require('../config/knex'); 
 
 
   function validate(tbl) {
   return async function (req,res, next) {
     let email = req.body.email; 
-    let user = await knex(tbl).where('email', email); 
+    let user = await db(tbl).where('email', email); 
         if (user.length > 0) res.json({
             status: 400,
             success: false,
@@ -20,7 +20,7 @@ const knex = require('../config/knex').knex;
     if(req.headers.authorization && (req.headers.authorization.split(' ')[0] === 'bearer' || req.headers.authorization.split(' ')[0] === 'Bearer')) {
       const token = req.headers.authorization.split(' ')[1];
       console.log('token', token);
-      knex('signatures').where({token}).select().then((data) => {
+      db('signatures').where({token}).select().then((data) => {
         console.log(data);
         if (data) {
           next();
@@ -40,7 +40,7 @@ const knex = require('../config/knex').knex;
 
   async function valid(req, res, next) {
     let email = req.body.email; 
-let user = await knex('companies').where('email', email); 
+let user = await db('companies').where('email', email); 
         if (user.length > 0) return res.json({
             status: 400,
             success: false,
@@ -54,11 +54,11 @@ async function verify(req,res, next) {
   let email = req.body.email; 
   let phone= req.body.phone;
   let code = req.body.code;
-  let user = await knex('activations').where({'email': email, 'phone': phone});  
+  let user = await db('activations').where({'email': email, 'phone': phone});  
   let rcode = user[0].code; 
   rcode = rcode.replace(/ +/g, ""); 
   if (user.length > 0 && rcode === code) {
-    knex('activations').where({ id: user[0].id }).del().then( d => {
+    db('activations').where({ id: user[0].id }).del().then( d => {
       next();
     });   
 

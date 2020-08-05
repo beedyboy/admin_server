@@ -1,48 +1,32 @@
 
-exports.up = function(knex) { 
-    return knex
+exports.up = function(knex) {
+   return knex
     .schema
 
-    .createTable( 'countries', function( countryTable ) { 
-        countryTable.engine('InnoDB'); 
-        countryTable.increments();
-        countryTable.string( 'name', 30 ).notNullable();  
-        countryTable.specificType( 'code', 'char(2)' ).nullable();  
-        countryTable.specificType( 'code2', 'char(3)' ).nullable();  
-        countryTable.string('phonecode',  50).nullable();
-        countryTable.string('capital',  50).nullable();
-        countryTable.string('currency',  50).nullable();
-        countryTable.string('created_at',  50).notNullable();
-        countryTable.string('updated_at',  50).nullable(); 
-    })
+ .createTable( 'company', function( companyTable ) { 
+    // companyTable.engine('InnoDB'); 
+    companyTable.increments();
+    companyTable.string( 'companyname', 30 ).notNullable();    
+    companyTable.string('email',  50).nullable();
+    companyTable.string('phone',  50).nullable();
+    companyTable.string('address',  50).nullable();
+	companyTable.string( 'image', 100 ).nullable();    
+    companyTable.string('updated_at',  50).nullable(); 
+})
 
-    .createTable( 'states', function( statesTable ) { 
-        statesTable.engine('InnoDB'); 
-        statesTable.increments();
-        statesTable.string( 'name', 30 ).notNullable();  
-        statesTable.integer( 'country_id' ).unsigned().notNullable(); 
-        statesTable.string( 'state_code', 15 ).notNullable();  
-        statesTable.string('created_at',  50).notNullable();
-        statesTable.string('updated_at',  50).nullable(); 
-        statesTable.foreign('country_id').references('id').inTable('countries')
-        .onDelete('CASCADE') .onUpdate('CASCADE');
-    })
+.createTable( 'pages', function( pagesTable ) { 
+    // pagesTable.engine('InnoDB'); 
+    pagesTable.increments();
+    pagesTable.string( 'title', 30 ).notNullable();    
+    pagesTable.string('slug',  50).nullable();
+    pagesTable.text('description').nullable();    
+    pagesTable.string('created_at',  50).nullable(); 
+    pagesTable.string('updated_at',  50).nullable(); 
+})
 
-    .createTable( 'cities', function( cityTable ) { 
-        cityTable.engine('InnoDB'); 
-        cityTable.increments();
-        cityTable.string( 'name', 30 ).notNullable();  
-        cityTable.integer( 'state_id').unsigned().notNullable(); 
-        cityTable.decimal( 'latitude', 10,8 ).notNullable();  
-        cityTable.decimal( 'longitude', 11,8 ).notNullable();  
-        cityTable.string('created_at',  50).notNullable();
-        cityTable.string('updated_at',  50).nullable();  
-        cityTable.foreign('state_id').references('id').inTable('states')
-        .onDelete('CASCADE') .onUpdate('CASCADE');
-    })
-        
+
 .createTable( 'roles', function( rolesTable ) { 
-    rolesTable.engine('InnoDB'); 
+    // rolesTable.engine('InnoDB'); 
     rolesTable.increments();
     rolesTable.string( 'name', 30 ).notNullable();  
     rolesTable.text( 'priviledges' ).notNullable();  
@@ -52,7 +36,7 @@ exports.up = function(knex) {
 })
 
   .createTable( 'staffs', function( staffsTable ) { 
-    staffsTable.engine('InnoDB'); 
+    // staffsTable.engine('InnoDB'); 
     staffsTable.increments();
     staffsTable.integer('role').unsigned().notNullable(); 
     staffsTable.string( 'fullname', 50 ).notNullable(); 
@@ -67,27 +51,21 @@ exports.up = function(knex) {
     staffsTable.foreign('role').references('id').inTable('roles')
     .onDelete('CASCADE') .onUpdate('CASCADE');
 }) 
-
  
  
 .createTable( 'signatures', function( signatureTable ) { 
-    signatureTable.engine('InnoDB');
+    // signatureTable.engine('InnoDB');
     signatureTable.increments(); 
-    signatureTable.integer('admin_id').unsigned().nullable(); 
-    signatureTable.integer('mid').unsigned().nullable(); 
+    signatureTable.integer('admin_id').unsigned().nullable();  
     signatureTable.string( 'token', 250 ).nullable();  
     signatureTable.string( 'useragent', 250 ).nullable();  
     signatureTable.foreign('admin_id').references('id').inTable('staffs')
-    .onDelete('CASCADE') .onUpdate('CASCADE'); 
-    signatureTable.foreign('mid').references('id').inTable('members')
-    .onDelete('CASCADE') .onUpdate('CASCADE');
+    .onDelete('CASCADE') .onUpdate('CASCADE');  
 })
-
-
-
+ 
 
 .createTable( 'categories', function( catTable ) { 
-    catTable.engine('InnoDB');
+    // catTable.engine('InnoDB');
     catTable.increments();   
     catTable.string( 'name', 30 ).notNullable();      
     catTable.string( 'description', 100 ).nullable();    
@@ -96,9 +74,8 @@ exports.up = function(knex) {
     catTable.enu('status', ['Active', 'Inactive', 'Deleted']).defaultTo('Active');
 })
 
-
 .createTable( 'tokens', function( tokenTable ) { 
-    tokenTable.engine('InnoDB');
+    // tokenTable.engine('InnoDB');
     tokenTable.increments();  
     tokenTable.string( 'referrer', 20 ).notNullable();  
     tokenTable.string( 'token', 250 ).nullable();  
@@ -109,7 +86,6 @@ exports.up = function(knex) {
 	tokenTable.string('updated_at',  50).nullable();
 })
 
-  //product will have location
 };
 
 exports.down = function(knex) {

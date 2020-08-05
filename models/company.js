@@ -1,5 +1,5 @@
 const express = require('express');
-const knex = require('../config/knex').knex; 
+const db = require('../config/knex'); 
 const helper = require('../lib/helper');
 const { generateSlug } = require('../lib/function');
 const mailer = require("../plugins/mailer"); 
@@ -13,7 +13,7 @@ const router = express.Router();
  
 
 router.get("/", (req, res) => {  
-        const result = knex('company').select().then( ( data ) => {  
+        const result = db('company').select().then( ( data ) => {  
              res.send( data ).status(200);
             
             
@@ -27,11 +27,11 @@ router.get("/", (req, res) => {
 router.get("/dashboard", (req, res) => {  
     let buyers = 0;
     let sellers = 0;
-    knex('buyers').count('id as b').then( (buyer) => {
+    db('buyers').count('id as b').then( (buyer) => {
         buyers = buyer[0].b; 
-    knex('sellers').count('id as s').then( (seller) => {
+    db('sellers').count('id as s').then( (seller) => {
             sellers = seller[0].s
-    knex('products').count('id as p').then( (product) => {
+    db('products').count('id as p').then( (product) => {
         res.send({
         buyers,
         sellers,
@@ -54,7 +54,7 @@ router.post("/mail", (req, res) => {
 
 router.get("/getProfile", (req, res) => {  
     const id = 1 ; 
-        const result = knex('company').where({id}).select().then( ( data ) => {              
+        const result = db('company').where({id}).select().then( ( data ) => {              
             if(data) {
                 res.send({
                     status: 200,
@@ -66,7 +66,7 @@ router.get("/getProfile", (req, res) => {
 });
 
 router.get("/pages", (req, res) => {   
-        const result = knex('pages').select().then( ( data ) => {              
+        const result = db('pages').select().then( ( data ) => {              
             if(data) {
                 res.send({
                     status: 200,
@@ -80,7 +80,7 @@ router.get("/pages", (req, res) => {
 
 router.post("/",  (req, res) => { 
     const { name: companyname, address, email,  phone} = req.body;   
-    knex('company').where('id', 1).update({  companyname, address, email, phone }).then( ( result ) => { 
+    db('company').where('id', 1).update({  companyname, address, email, phone }).then( ( result ) => { 
         
         if(result) { 
             res.send( {
@@ -101,7 +101,7 @@ router.post("/pages",  (req, res) => {
     const { description, title} = req.body; 
     const slug =   generateSlug(title);
     const created_at = new Date().toLocaleString();
-    knex('pages').insert({  description, title, slug, created_at }).then( ( result ) => { 
+    db('pages').insert({  description, title, slug, created_at }).then( ( result ) => { 
         
         if(result) { 
             res.send( {
@@ -121,7 +121,7 @@ router.post("/pd",  (req, res) => {
 //    console.log("REQUEST", req.body);
     const { name: companyname, address, email,  phone} = req.body;  
     const created_at = new Date().toLocaleString(); 
-    knex('company').insert({  companyname, address, email, phone, created_at }).then( ( result ) => { 
+    db('company').insert({  companyname, address, email, phone, created_at }).then( ( result ) => { 
         
         if(result) {
             const code = helper.generateToken();
@@ -131,7 +131,7 @@ router.post("/pd",  (req, res) => {
             const status = 'Account';
             const message = `Your one time verification code is ${code}`;
             sms.sendMessage(phone, message);
-            knex('activations').insert({ email, phone, code, status }).then( (result) => {
+            db('activations').insert({ email, phone, code, status }).then( (result) => {
                 mailer.sendMail(subject,email,body);
             });
            

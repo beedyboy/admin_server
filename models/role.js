@@ -1,6 +1,6 @@
 const express = require('express'); 
 const helper = require('../lib/helper');
-const knex = require('../config/knex').knex; 
+const db = require('../config/knex'); 
 // const {valid} = require('../middleware/valid'); 
 // const mailer = require("../plugins/mailer");
 // const router = require('express').Router;
@@ -11,7 +11,7 @@ const router = express.Router();
 //get role details by id
 router.get("/:id", (req, res) => {
     const name = req.params.id;
-    const result = knex('roles').where('id', name).select().then( ( data ) => { 
+    const result = db('roles').where('id', name).select().then( ( data ) => { 
     if(data) {
         res.send({
             status: 200,
@@ -32,7 +32,7 @@ router.get("/:id", (req, res) => {
 //check whether role exist
 router.get("/:name/exist", (req, res) => {   
     const name = req.params.name ;
-       const result = knex('roles').where({name}).select().then( ( data ) => { 
+       const result = db('roles').where({name}).select().then( ( data ) => { 
             if(data.length > 0) {
                 res.send({
                     exist: true
@@ -52,7 +52,7 @@ router.get("/:name/exist", (req, res) => {
 
 //get all roles
 router.get("/", (req, res) => {  
-   knex('roles').select().then( ( data ) => {  
+   db('roles').select().then( ( data ) => {  
              res.send( data ).status(200); 
              });
 });
@@ -65,7 +65,7 @@ router.post("/",  (req, res) => {
     // let response = null;
     const priviledges = JSON.stringify(req.body.priviledges);
     // console.log('body', priviledges);
-    knex('roles').insert({  name, priviledges, created_at }).then( ( result ) => { 
+    db('roles').insert({  name, priviledges, created_at }).then( ( result ) => { 
         
         if(result) { 
             res.send( {
@@ -84,7 +84,7 @@ router.post("/update",  (req, res) => {
     const {name, id} = req.body; 
     const updated_at = new Date().toLocaleString(); 
     const priviledges = JSON.stringify(req.body.priviledges); 
-    knex('roles').where('id', id).update({  name, priviledges, updated_at }).then( ( result ) => {         
+    db('roles').where('id', id).update({  name, priviledges, updated_at }).then( ( result ) => {         
         if(result) { 
             res.send( {
                 status: 200,
@@ -102,7 +102,7 @@ router.post("/update",  (req, res) => {
 router.delete("/:id", (req, res) => {
 //    console.log('req', req.params) 
    try {
-    knex('roles').where('id', req.params.id).del().then( (result) => {
+    db('roles').where('id', req.params.id).del().then( (result) => {
         res.send({
             status: 200,
             message: 'Role deleted successgully'

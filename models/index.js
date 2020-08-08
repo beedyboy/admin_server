@@ -29,6 +29,8 @@ routes.use("/buyer", buyer);
 routes.use("/shop", shop);
 routes.use("/product", product);
 
+routes.use(cors(corsOptions)); 
+routes.options("*", cors(corsOptions));
 module.exports = routes;
 
 // const account = require('./company');
@@ -47,6 +49,3 @@ module.exports = routes;
 //   }
 // }
 
-// routes.use(cors(corsOptions));
-
-// routes.options("*", cors(corsOptions));

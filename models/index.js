@@ -1,7 +1,6 @@
 const express = require('express'); 
 const routes = express.Router();
 const company = require('./company');
-const cors = require("cors"); 
 const staff = require('./staff');
 const role = require('./role');
 const category = require('./category');
@@ -11,14 +10,6 @@ const shop = require('./shop');
 const product = require('./product');
 
 
-const API_URL = "https://admin-commerce.herokuapp.com";
-const corsOptions = {
-    allowedHeaders: ["Origin"," X-Requested-With", "Content-Type", "Accept", "X-Access-Token"],
-    credentials: true,
-    methods: "GET,HEAD,OPTIONS,PUT,PATH,POST,DELETE",
-    origin: API_URL,
-    preflightContinue: false
-};
 
 routes.use("/company", company);
 routes.use("/staff", staff);
@@ -29,14 +20,20 @@ routes.use("/buyer", buyer);
 routes.use("/shop", shop);
 routes.use("/product", product);
 
-routes.use(cors(corsOptions)); 
-routes.options("*", cors(corsOptions));
 module.exports = routes;
 
 // const account = require('./company');
 // const cors = require("cors"); 
 
 
+// const API_URL = "http://commerce.devprima.com";
+// const corsOptions = {
+//     allowedHeaders: ["Origin"," X-Requested-With", "Content-Type", "Accept", "X-Access-Token"],
+//     credentials: true,
+//     methods: "GET,HEAD,OPTIONS,PUT,PATH,POST,DELETE",
+//     origin: API_URL,
+//     preflightContinue: false
+// };
 
 // var whitelist = ['http://192.168.43.13', 'http://example2.com']
 // var corsOptions = {
@@ -49,3 +46,6 @@ module.exports = routes;
 //   }
 // }
 
+// routes.use(cors(corsOptions));
+
+// routes.options("*", cors(corsOptions));

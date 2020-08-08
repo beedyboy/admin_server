@@ -179,39 +179,48 @@ router.post("/toggle", (req, res) => {
 });
 
 router.post("/auth", (req, res) => {
+  try {
+    
    const username = req.body.user;
-    const password = helper.hash(req.body.password); 
-    db('staffs').where({username}).select().then( (user ) => {
-        if(user.length > 0) {
-        const data = user[0];
-        if (bcrypt.compareSync(req.body.password, data.password)) {
-             const token = helper.generateToken(data);  
-              db('signatures').where('admin_id', data.id).update( 'token', token).then( sign => {
-         if(sign) {
-          res.send({
-            status: 200,
-             msg: "Login successful", 
-            user: data,
-            token
-           });
-          }
-      });
-           
-        } else {
+   const password = helper.hash(req.body.password); 
+   db('staffs').where({username}).select().then( (user ) => {
+       if(user.length > 0) {
+       const data = user[0];
+       if (bcrypt.compareSync(req.body.password, data.password)) {
+            const token = helper.generateToken(data);  
+             db('signatures').where('admin_id', data.id).update( 'token', token).then( sign => {
+        if(sign) {
+         res.send({
+           status: 200,
+            msg: "Login successful", 
+           user: data,
+           token
+          });
+         }
+     });
+          
+       } else {
+           res.send({
+         status: 400,
+         msg: "wrong username or password"
+       });
+       }
+          
+       } else {
             res.send({
-          status: 400,
-          msg: "wrong username or password"
-        });
-        }
-           
-        } else {
-             res.send({
-          status: 400,
-          msg: "wrong username or password"
-        });
-        }
-        
+         status: 400,
+         msg: "wrong username or password"
+       });
+       }
+       
+   })
+    
+  } catch (error) {
+    console.log(err);
+    res.status(500).json({
+      err
     })
+  }
    
 });
 

@@ -8,22 +8,22 @@ const seller = require('./seller');
 const buyer = require('./buyer');
 const shop = require('./shop');
 const product = require('./product');
-var cors = require('cors');
+// var cors = require('cors');
 
-var whitelist = ['https://admin-commerce.herokuapp.com', 'http://example2.com']
-var corsOptions = {
-  origin: function (origin) {
-    if (whitelist.indexOf(origin) !== -1) {
-      console.log("Allowed");
-    } else {
-      console.log('Not allowed by CORS');
-    }
-  }
-}
+// var whitelist = ['https://admin-commerce.herokuapp.com', 'http://example2.com']
+// var corsOptions = {
+//   origin: function (origin) {
+//     if (whitelist.indexOf(origin) !== -1) {
+//       console.log("Allowed");
+//     } else {
+//       console.log('Not allowed by CORS');
+//     }
+//   }
+// }
 
-routes.use(cors(corsOptions));
+// routes.use(cors(corsOptions));
 
-routes.options("*", cors(corsOptions));
+// routes.options("*", cors(corsOptions));
 
 
 routes.use("/company", company);

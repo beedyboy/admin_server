@@ -76,10 +76,7 @@ exports.up = function(knex) {
 		productTable.text( 'tags' ).nullable();         
 		productTable.string( 'latitude', 20 ).nullable();  
 		productTable.string( 'longitude', 20 ).nullable();  
-		productTable.string( 'main_image', 70 ).nullable(); 
-		productTable.string( 'first_image', 70 ).nullable(); 
-		productTable.string( 'middle_image', 70 ).nullable(); 
-		productTable.string( 'last_image', 70 ).nullable();  
+		productTable.text( 'images' ).nullable();   
 		productTable.enu('status', ['Active', 'Pending', 'Deleted']).defaultTo('Pending');    
 		productTable.string('created_at',  50).nullable();
 		productTable.string('updated_at',  50).nullable();
@@ -91,10 +88,10 @@ exports.up = function(knex) {
 .createTable( 'stocks', function( stockTable ) {  
 		stockTable.increments();   
 		stockTable.integer('product_id').unsigned().nullable();  
-		stockTable.string( 'available', 30 ).nullable();      
-		stockTable.string( 'price', 30 ).nullable();       
-		stockTable.string( 'latitude', 20 ).nullable();  
-		stockTable.string( 'longitude', 20 ).nullable();   
+		stockTable.string( 'stock_name', 30 ).nullable();     
+		stockTable.string( 'quantity', 30 ).nullable();     
+		stockTable.string( 'weight', 30 ).nullable();        
+		stockTable.string( 'price', 30 ).nullable();    
 		stockTable.string( 'first_delivery', 50 ).nullable();    
 		stockTable.string( 'second_delivery', 50 ).nullable();    
 		stockTable.string( 'third_delivery', 50 ).nullable(); 

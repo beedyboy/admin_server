@@ -28,17 +28,26 @@ router.get("/:id", (req, res) => {
 
 //get all sellers
 router.get("/", (req, res) => {  
-const result = db('sellers').select().then( ( data ) => {   
- if(data) {
-              res.send({
-                  status: 200,
-                  data
-              })
-          } 
-          
-           }).catch(err => {
-            console.error('my product', err);
-          })
+try {
+  db('sellers as s')
+  .join('shops as shop', 's.shop_id', '=', 'shop.id')
+  .select('s.*', 'shop.shop_name').then( ( data ) => {   
+    if(data) {
+      res.send({
+        status: 200,
+        data
+        })
+      }              
+      }).catch(err => {
+        console.error('my product', err);
+      })
+} catch (error) {
+  console.log(err);
+  res.status(500).json({
+    status: 400,
+    err
+  })
+}
 }); 
 
   

@@ -131,15 +131,16 @@ router.post("/", validate('staffs'),  (req, res) => {
                 message: 'Account was not created'
             })
         }
-    })
-           
+    })     
         } else {
             res.send({
                 status: 404,
                 message: 'Account was not created'
             })
         }
-    }); 
+    }).catch((err) => {
+      console.log('err', err);
+    })
 });
 
 router.post("/update", (req, res) => {   

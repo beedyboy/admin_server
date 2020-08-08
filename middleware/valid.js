@@ -1,19 +1,29 @@
 
 const db = require('../config/knex'); 
 
-
-  function validate(tbl) {
+function validate(tbl) {
   return async function (req,res, next) {
+   try {
     let email = req.body.email; 
-    let user = await db(tbl).where('email', email); 
-        if (user.length > 0) res.json({
-            status: 400,
-            success: false,
-            msg: "Email already exist"
-        });
+    await db(tbl).where('email', email).then( (user) => { 
+      if (user.length > 0) {
+        res.json({
+          status: 400,
+          success: false,
+          msg: "Email already exist"
+      });
+      } else {
         next();
+      }
+    })
+   
+   } catch (error) {
+     console.log('err', err);
+     
+   }
   }
 }
+  
 
  function checkHeader(req, res, next) {
   try {

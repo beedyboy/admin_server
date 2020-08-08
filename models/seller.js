@@ -58,7 +58,7 @@ router.post("/toggle", (req, res) => {
      .update('updated_at', updated_at)
     .then( ( data ) => {  
       if(data > 0) {
-          helper.actDCTLogin('shop_id', id, status)
+          helper.actDCTLogin('seller_id', id, status)
         res.send({
         status: 200, 
         message: "Seller account updated" 

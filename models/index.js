@@ -8,7 +8,19 @@ const seller = require('./seller');
 const buyer = require('./buyer');
 const shop = require('./shop');
 const product = require('./product');
-// var cors = require('cors');
+var cors = require('cors');
+
+var whitelist = ['https://admin-commerce.herokuapp.com'];
+var corsOptions = {
+    origin: function (origin, callback) {
+        if (whitelist.indexOf(origin) !== -1) {
+            callback(null, true)
+        } else {
+            callback(new Error("Not allowed by cors"))
+        }
+    }
+}
+routes.use(cors(corsOptions));
 
 // var whitelist = ['https://admin-commerce.herokuapp.com', 'http://example2.com']
 // var corsOptions = {
@@ -23,7 +35,7 @@ const product = require('./product');
 
 // routes.use(cors(corsOptions));
 
-// routes.options("*", cors(corsOptions));
+routes.options("*", cors(corsOptions));
 
 
 routes.use("/company", company);

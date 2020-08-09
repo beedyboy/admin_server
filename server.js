@@ -2,20 +2,30 @@ const express = require("express");
 const bodyParser = require('body-parser'); 
 const path = require('path'); 
 const fs = require('fs'); 
-// const cors = require("cors"); 
+const cors = require("cors"); 
 var routes = require('./models/index');
 // var sms = require('./plugins/sms');
 const app = express();
 
-// app.use(cors());
-app.all('*', function(req, res, next) {
-	 var origin = req.get('origin'); 
-	// var origin = "https://admin-commerce.herokuapp.com";
-     res.header('Access-Control-Allow-Origin', origin); 
-	 res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS'); 
-	 res.header("Access-Control-Allow-Headers", "Origin,X-Requested-With,Content-Type,Accept,Authorization"); 
-     next();
-});
+var whitelist = ['https://admin-commerce.herokuapp.com'];
+var corsOptions = {
+    origin: function (origin, callback) {
+        if (whitelist.indexOf(origin) !== -1) {
+            callback(null, true)
+        } else {
+            callback(new Error("Not allowed by cors"))
+        }
+    }
+}
+app.use(cors(corsOptions));
+// app.all('*', function(req, res, next) {
+// 	 var origin = req.get('origin'); 
+// 	// var origin = "https://admin-commerce.herokuapp.com";
+//      res.header('Access-Control-Allow-Origin', origin); 
+// 	 res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS'); 
+// 	 res.header("Access-Control-Allow-Headers", "Origin,X-Requested-With,Content-Type,Accept,Authorization"); 
+//      next();
+// });
 app.use('/uploads', express.static('uploads'));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());

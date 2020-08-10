@@ -17,43 +17,49 @@ const app = express();
 //         }
 //     }
 // }
-// app.use(cors(corsOptions));
-// app.all('*', function(req, res, next) {
-// 	 var origin = req.get('origin'); 
-// 	// var origin = "https://admin-commerce.herokuapp.com";
-//      res.header('Access-Control-Allow-Origin', origin); 
-// 	 res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS'); 
-// 	 res.header("Access-Control-Allow-Headers", "Origin,X-Requested-With,Content-Type,Accept,Authorization"); 
-//      next();
-// });
+
 app.use('/uploads', express.static('uploads'));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
  
+app.use(function(req, res, next) {
+    var oneof = false;
+    if(req.headers.origin) {
+        res.header('Access-Control-Allow-Origin', req.headers.origin);
+        oneof = true;
+    }
+    if(req.headers['access-control-request-method']) {
+        res.header('Access-Control-Allow-Methods', req.headers['access-control-request-method']);
+        oneof = true;
+    }
+    if(req.headers['access-control-request-headers']) {
+        res.header('Access-Control-Allow-Headers', req.headers['access-control-request-headers']);
+        oneof = true;
+    }
+    if(oneof) {
+        res.header('Access-Control-Max-Age', 60 * 60 * 24 * 365);
+    }
 
- 
+    // intercept OPTIONS method
+    if (oneof && req.method == 'OPTIONS') {
+        res.send(200);
+    }
+    else {
+        next();
+    }
+});
+
+
 // app.use((req, res, next) => {
-// 	res.header("Access-Control-Allow-Origin", "https://admin-commerce.herokuapp.com"); 
-// 		res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET, OPTIONS');
-// 	res.header("Access-Control-Allow-Headers", "Origin,X-Requested-With,Content-Type,Accept,Authorization");
+// 	res.header("Access-Control-Allow-Origin", "*"); 
+//     res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET, OPTIONS');
+// 	res.header("Access-Control-Allow-Headers", "x-www-form-urlencoded, Origin, X-Requested-With, Content-Type, Accept, Authorization");
 // 	if (req.method === 'OPTIONS') { 
-//         res.header("Access-Control-Allow-Headers", "Origin,X-Requested-With,Content-Type,Accept,Authorization");
-// 		return res.status(204).json({});
+// 		res.header('Access-Control-Allow-Methods', 'PUT, POST, OPTIONS, PATCH, DELETE, GET');
+// 		return res.status(200).json({});
 // 	}
 // 	next();
 // });
-
-
-app.use((req, res, next) => {
-	res.header("Access-Control-Allow-Origin", "*"); 
-    res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET, OPTIONS');
-	res.header("Access-Control-Allow-Headers", "x-www-form-urlencoded, Origin, X-Requested-With, Content-Type, Accept, Authorization");
-	if (req.method === 'OPTIONS') { 
-		res.header('Access-Control-Allow-Methods', 'PUT, POST, OPTIONS, PATCH, DELETE, GET');
-		return res.status(200).json({});
-	}
-	next();
-});
 app.use('/api', routes); 
 app.get('/', (req,res) => { 
  res.writeHead(200, {'Content-Type': 'text/plain'});

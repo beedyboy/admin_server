@@ -180,8 +180,8 @@ router.post("/toggle", (req, res) => {
 });
 
 router.post("/auth", (req, res) => {
-  const username = req.body.user;
-  const password = helper.hash(req.body.password); 
+ try {
+  const username = req.body.user; 
   db('staffs').where({username}).select().then( (user) => {
     if(user.length > 0) {
       const data = user[0];
@@ -190,12 +190,12 @@ router.post("/auth", (req, res) => {
           const token = gt;
           db('signatures').where('admin_id', data.id).update( 'token', token).then((sign) => {
             if(sign) {
-            res.send({
-              status: 400,
-               msg: "Login successful", 
-               id: data.id,
-              token 
-             });  
+              res.send({
+                status: 200,
+                 msg: "Login successful", 
+                user: data,
+                token
+               });
             } 
           }) 
         })  
@@ -216,55 +216,15 @@ router.post("/auth", (req, res) => {
      
     
   })
+ } catch (error) {
+   console.log(error);
+   res.status(500).json({
+     message: "Something went wrong witht the request!!!"
+   })
+ }
   
 })
 
-  
-router.post("/auths", (req, res) => {
-  try {
-    
-   const username = req.body.user;
-   const password = helper.hash(req.body.password); 
-   db('staffs').where({username}).select().then( (user ) => {
-       if(user.length > 0) {
-       const data = user[0];
-       if (bcrypt.compareSync(req.body.password, data.password)) {
-            const token = helper.generateToken(data);  
-             db('signatures').where('admin_id', data.id).update( 'token', token).then( sign => {
-        if(sign) {
-         res.send({
-           status: 200,
-            msg: "Login successful", 
-           user: data,
-           token
-          });
-         }
-     });
-          
-       } else {
-           res.send({
-         status: 400,
-         msg: "wrong username or password"
-       });
-       }
-          
-       } else {
-            res.send({
-         status: 400,
-         msg: "wrong username or password"
-       });
-       }
-       
-   })
-    
-  } catch (error) {
-    console.log(err);
-    res.status(500).json({
-      err
-    })
-  }
    
-});
-
 
 module.exports = router;

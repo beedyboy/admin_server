@@ -182,12 +182,15 @@ router.post("/toggle", (req, res) => {
 router.post("/auth", (req, res) => {
   const username = req.body.user;
   const password = helper.hash(req.body.password); 
-  res.send({
-    status: 400,
-     msg: "Login successful", 
-    user: username,
-    password
-   });
+  db('staffs').where({username}).select().then( (user) => {
+    res.send({
+      status: 400,
+       msg: "Login successful", 
+      user 
+       
+     });
+  })
+  
 })
 
   

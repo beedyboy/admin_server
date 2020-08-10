@@ -12,12 +12,11 @@ const app = express();
 // app.options('*', cors());
 
  
-app.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "https://admin-commerce.herokuapp.com"); // update to match the domain you will make the request from
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-    next();
-  });
- 
+// app.use(function(req, res, next) {
+//     res.header("Access-Control-Allow-Origin", "*");  
+//     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+//     next();
+//   }); 
 // app.use((req, res, next) => {
 // 	res.header("Access-Control-Allow-Origin", "*"); 
 //     res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET, OPTIONS');
@@ -32,7 +31,24 @@ app.use(function(req, res, next) {
 app.use('/uploads', express.static('uploads'));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
+app.use(function (req, res, next) {
 
+    // Website you wish to allow to connect
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    // Request methods you wish to allow
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+
+    // Request headers you wish to allow
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type, authorization');
+
+    // Set to true if you need the website to include cookies in the requests sent
+    // to the API (e.g. in case you use sessions)
+    res.setHeader('Access-Control-Allow-Credentials', true);
+
+    // Pass to next layer of middleware
+    next();
+});
 app.use('/api', routes); 
 app.get('/', (req,res) => { 
  res.writeHead(200, {'Content-Type': 'text/plain'});

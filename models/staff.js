@@ -191,7 +191,7 @@ router.post("/auth", (req, res) => {
           res.send({
             status: 400,
              msg: "Login successful", 
-             token,
+             id: data.id,
             user  
            }); 
         })

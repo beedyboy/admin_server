@@ -186,16 +186,19 @@ router.post("/auth", (req, res) => {
     if(user.length > 0) {
       const data = user[0];
       if (bcrypt.compareSync(req.body.password, data.password)) {
-        // const token = helper.generateToken(data);  
-        const token = 'ujbfbfbnorjor9u5u5i';
-        db('signatures').where('admin_id', data.id).update( 'token', token).then((sign) => {
-          res.send({
-            status: 400,
-             msg: "Login successful", 
-             id: data.id,
-            user  
-           }); 
+        helper.generateToken(data).then(gt => {
+          const token = gt;
+          db('signatures').where('admin_id', data.id).update( 'token', token).then((sign) => {
+            res.send({
+              status: 400,
+               msg: "Login successful", 
+               id: data.id,
+              token  
+             }); 
+          })
         })
+        // const token = 'ujbfbfbnorjor9u5u5i';
+       
        
       }
      

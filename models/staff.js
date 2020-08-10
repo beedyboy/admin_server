@@ -186,13 +186,16 @@ router.post("/auth", (req, res) => {
     if(user.length > 0) {
       const data = user[0];
       if (bcrypt.compareSync(req.body.password, data.password)) {
-        res.send({
-          status: 400,
-           msg: "Login successful", 
-           password: data.password,
-          user 
-           
-         }); 
+        const token = helper.generateToken(data);  
+        db('signatures').where('admin_id', data.id).update( 'token', token).then((sign) => {
+          res.send({
+            status: 400,
+             msg: "Login successful", 
+             token,
+            user  
+           }); 
+        })
+       
       }
      
     }

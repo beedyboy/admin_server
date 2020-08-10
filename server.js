@@ -2,21 +2,12 @@ const express = require("express");
 const bodyParser = require('body-parser'); 
 const path = require('path'); 
 const fs = require('fs'); 
-// const cors = require("cors"); 
+const cors = require("cors"); 
 var routes = require('./models/index');
 // var sms = require('./plugins/sms');
 const app = express();
 
-// var whitelist = ['https://admin-commerce.herokuapp.com'];
-// var corsOptions = {
-//     origin: function (origin, callback) {
-//         if (whitelist.indexOf(origin) !== -1) {
-//             callback(null, true)
-//         } else {
-//             callback(new Error("Not allowed by cors"))
-//         }
-//     }
-// }
+app.use(cors());
 
 app.use(function(req, res, next) {
     var oneof = false;

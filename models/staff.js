@@ -183,12 +183,16 @@ router.post("/auth", (req, res) => {
   const username = req.body.user;
   const password = helper.hash(req.body.password); 
   db('staffs').where({username}).select().then( (user) => {
-    res.send({
-      status: 400,
-       msg: "Login successful", 
-      user 
-       
-     });
+    if(user.length > 0) {
+      const data = user[0];
+      res.send({
+        status: 400,
+         msg: "Login successful", 
+         password: data.password,
+        user 
+         
+       }); 
+    }
   })
   
 })

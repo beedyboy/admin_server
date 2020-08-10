@@ -7,7 +7,9 @@ var routes = require('./models/index');
 // var sms = require('./plugins/sms');
 const app = express();
 
-// app.use(cors());
+
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
 
 // app.options('*', cors());
 
@@ -39,8 +41,6 @@ app.use(cors({
   'preflightContinue': false
 }));
 
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(bodyParser.json());
 
 app.use('/api', routes); 
 app.get('/', (req,res) => { 

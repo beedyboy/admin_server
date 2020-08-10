@@ -9,6 +9,8 @@ const app = express();
 
 app.use(cors());
 
+app.options('*', cors());
+
 app.use(function(req, res, next) {
     var oneof = false;
     if(req.headers.origin) {

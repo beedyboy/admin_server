@@ -185,13 +185,16 @@ router.post("/auth", (req, res) => {
   db('staffs').where({username}).select().then( (user) => {
     if(user.length > 0) {
       const data = user[0];
-      res.send({
-        status: 400,
-         msg: "Login successful", 
-         password: data.password,
-        user 
-         
-       }); 
+      if (bcrypt.compareSync(req.body.password, data.password)) {
+        res.send({
+          status: 400,
+           msg: "Login successful", 
+           password: data.password,
+          user 
+           
+         }); 
+      }
+     
     }
   })
   

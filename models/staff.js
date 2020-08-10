@@ -193,7 +193,8 @@ router.post("/auth", (req, res) => {
               status: 400,
                msg: "Login successful", 
                id: data.id,
-              token  
+              token, 
+              sign  
              }); 
           })
         })

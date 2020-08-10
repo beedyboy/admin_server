@@ -189,21 +189,32 @@ router.post("/auth", (req, res) => {
         helper.generateToken(data).then(gt => {
           const token = gt;
           db('signatures').where('admin_id', data.id).update( 'token', token).then((sign) => {
+            if(sign) {
             res.send({
               status: 400,
                msg: "Login successful", 
                id: data.id,
-              token, 
-              sign  
-             }); 
-          })
-        })
-        // const token = 'ujbfbfbnorjor9u5u5i';
-       
-       
+              token 
+             });  
+            } 
+          }) 
+        })  
       }
-     
+      else {
+        res.send({
+      status: 400,
+      msg: "wrong username or password"
+    });
     }
+       
+    } else {
+         res.send({
+      status: 400,
+      msg: "wrong username or password"
+    });
+    }
+     
+    
   })
   
 })

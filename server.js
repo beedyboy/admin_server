@@ -7,8 +7,15 @@ var routes = require('./models/index');
 // var sms = require('./plugins/sms');
 const app = express();
 
-
-app.use(bodyParser.urlencoded({extended: true}));
+// enables cors
+app.use(cors({
+  'allowedHeaders': ['sessionId', 'Content-Type', 'X-Requested-With', 'Accept', 'Authorization'],
+  'exposedHeaders': ['sessionId'],
+  'origin': 'https://admin-commerce.herokuapp.com',
+  'methods': 'OPTIONS,GET,HEAD,PUT,PATCH,POST,DELETE',
+  'preflightContinue': false
+}));
+app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
 // app.options('*', cors());
@@ -19,27 +26,20 @@ app.use(bodyParser.json());
 //     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
 //     next();
 //   }); 
-app.use((req, res, next) => {
-	res.header("Access-Control-Allow-Origin", "https://admin-commerce.herokuapp.com"); 
-    res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET, OPTIONS');
-	res.header("Access-Control-Allow-Headers", "x-www-form-urlencoded, Origin, X-Requested-With, Content-Type, Accept, Authorization");
-	if (req.method === 'OPTIONS') { 
-		res.header('Access-Control-Allow-Methods', 'PUT, POST, OPTIONS, PATCH, DELETE, GET');
-		return res.status(200).json({});
-	}
-	next();
-});
+// app.use((req, res, next) => {
+// 	res.header("Access-Control-Allow-Origin", "https://admin-commerce.herokuapp.com"); 
+//     res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET, OPTIONS');
+// 	res.header("Access-Control-Allow-Headers", "x-www-form-urlencoded, Origin, X-Requested-With, Content-Type, Accept, Authorization");
+// 	if (req.method === 'OPTIONS') { 
+// 		res.header('Access-Control-Allow-Methods', 'PUT, POST, OPTIONS, PATCH, DELETE, GET');
+// 		return res.status(200).json({});
+// 	}
+// 	next();
+// });
 
 // app.use('/uploads', express.static('uploads'));
 
-//enables cors
-// app.use(cors({
-//   'allowedHeaders': ['sessionId', 'Content-Type', 'X-Requested-With', 'Accept', 'Authorization'],
-//   'exposedHeaders': ['sessionId'],
-//   'origin': 'https://admin-commerce.herokuapp.com',
-//   'methods': 'OPTIONS,GET,HEAD,PUT,PATCH,POST,DELETE',
-//   'preflightContinue': false
-// }));
+
 
 
 app.use('/api', routes); 

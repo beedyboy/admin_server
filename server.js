@@ -36,8 +36,8 @@ app.use(bodyParser.json());
 app.use(cors({
   'allowedHeaders': ['sessionId', 'Content-Type', 'X-Requested-With', 'Accept', 'Authorization'],
   'exposedHeaders': ['sessionId'],
-  'origin': '*',
-  'methods': 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  'origin': 'https://admin-commerce.herokuapp.com',
+  'methods': 'OPTIONS,GET,HEAD,PUT,PATCH,POST,DELETE',
   'preflightContinue': false
 }));
 

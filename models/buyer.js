@@ -40,6 +40,45 @@ const result = db('buyers').select().then( ( data ) => {
             console.error('my product', err);
           })
 }); 
+  
+//register buyer 
+router.post("/create/buyer", validate('logins'),  (req, res) => {   
+	try {
+		const { email} = req.body; 
+	const password = helper.hash(req.body.password);
+	const created_at = new Date().toLocaleString(); 
+	const preferred = "BUYER";
+	db('buyers')
+	.returning('id')
+	.insert({   email, created_at }).then( ( result ) => { 
+	if(result.length > 0) {   
+        const buyer_id = result[0];
+         helper.createBuyerSettings(buyer_id, created_at).then((rep) => {
+            if(rep === true) {
+                db('logins').insert({ buyer_id, preferred, email, password }).then( reply => {   
+        if(reply)  {
+           res.send({  status: 200,  message: 'Account created successfully' });
+        } else {
+           res.send({  status: 404,  message: 'Account not created' });
+        }
+    });
+            }
+         }) 
+	   
+	  }  else {
+			res.send({
+				status: 404,
+				message: 'Account was not created'
+			})
+		}
+	}).catch(err => {
+	  console.log(err);
+	}) 
+	} catch (error) {
+		console.log(error);
+		res.status(500).json({message: "Something went wrong"})
+	}
+});
 
  
 router.delete("/:id", (req, res) => { 

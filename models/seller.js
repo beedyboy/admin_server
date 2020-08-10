@@ -50,6 +50,55 @@ try {
 }
 }); 
 
+
+//register seller
+router.post("/create/seller", validate('logins'),  (req, res) => {   
+	try {
+		const { email} = req.body; 
+	const password = helper.hash(req.body.password);
+	const created_at = new Date().toLocaleString();  
+	const preferred = "SELLER";
+	 db('shops').returning('id')
+	.insert({created_at}).then((shop) => {
+	  if(shop.length > 0) {
+        helper.createSellerSettings(shop[0], created_at).then((rep) => {
+            if(rep === true) {
+                 db('sellers').returning('id')
+          .insert({ shop_id:shop[0], email, created_at }).then( ( result ) => {  
+          if(result.length > 0) {  
+        db('logins').insert({seller_id: result[0], preferred,  email,  password}).then( reply => {  
+        if(reply)  {
+           res.send({  status: 200,  message: 'Account created successfully' });
+        } else {
+           res.send({  status: 404,  message: 'Account not created' });
+        }
+    });
+       
+      }  else {
+            res.send({
+                status: 404,
+                message: 'Account was not created'
+            })
+        }
+    }); 
+            }
+        })
+		 
+	  } else {
+		res.send({
+		  status: 404,
+          message: 'Account was not created'
+		})
+	  }
+	})
+	} catch (error) {
+		console.log(error);
+		res.status(500).json({message: "Something went wrong"})
+	}
+
+});
+
+ 
   
 router.post("/toggle", (req, res) => {   
       const {status, id} = req.body;  

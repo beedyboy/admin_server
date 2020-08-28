@@ -11,7 +11,7 @@ const app = express();
 app.use(cors({
   'allowedHeaders': ['sessionId', 'Content-Type', 'X-Requested-With', 'Accept', 'Authorization'],
   'exposedHeaders': ['sessionId'],
-  'origin': 'https://admin-commerce.herokuapp.com',
+  'origin': '*',
   'methods': 'OPTIONS,GET,HEAD,PUT,PATCH,POST,DELETE',
   'preflightContinue': false
 }));
